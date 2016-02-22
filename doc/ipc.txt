@@ -78,6 +78,152 @@ The service ID is 0x00.
       + Command:  - Service id (1 octet)
       + Response: <none>
 
+### Digital TV service
+
+The service ID is 0x64.
+
+#### Commands / Responses
+
+  * Opcode 0x00   Error response
+
+      + Command:  - n/a
+      + Response: - Error code (1 octet)
+
+  * Opcode 0x01   Get tuners
+
+      + Command:  - # of tuners (4 octets)
+                  - Tuners (variable)
+      + Response: <none>
+
+  * Opcode 0x02   Set source
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+      + Response: Native handle (size of native_handle_t + data)
+
+  * Opcode 0x03   Start scanning channels
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+      + Response: <none>
+
+  * Opcode 0x04   Stop scanning channels
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+      + Response: <none>
+
+  * Opcode 0x05   Clear scanned channels cache
+
+      + Command:  <none>
+      + Response: <none>
+
+  * Opcode 0x06   Set channel
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+                  - Channel number / ID (string)
+      + Response: <none>
+
+  * Opcode 0x07   Get channels
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+      + Response: - # of channels (4 octets)
+                  - Channels (variable)
+
+  * Opcode 0x08   Get programs
+
+      + Command:  - Tuner ID (string)
+                  - Source type (1 octet)
+                  - Channel number / ID (string)
+                  - Start time (8 octets)
+                  - End time (8 octets)
+      + Response: - # of programs (4 octets)
+                  - Programs (variable)
+
+#### Notifications
+
+  * Opcode 0x80   Error
+
+      - Error code (1 octet)
+
+  * Opcode 0x81   Channel scanned
+
+      - Tuner ID (string)
+      - Source type (1 octet)
+      - Channel (variable)
+
+  * Opcode 0x82   Channel scan complete
+
+      - Tuner ID (string)
+      - Source type (1 octet)
+
+  * Opcode 0x83   Channel scan stopped
+
+      - Tuner ID (string)
+      - Source type (1 octet)
+
+  * Opcode 0x84   EIT broadcasted notification
+
+      - Tuner ID (string)
+      - Source type (1 octet)
+      - Channel (variable)
+      - # of programs (4 octets)
+      - Programs (variable)
+
+#### Enumerators
+
+  * Source type
+      0x00 = DVB-T
+      0x01 = DVB-T2
+      0x02 = DVB-C
+      0x03 = DVB-C2
+      0x04 = DVB-S
+      0x05 = DVB-S2
+      0x06 = DVB-H
+      0x07 = DVB-SH
+      0x08 = ATSC
+      0x09 = ATSC-M/H
+      0x0a = ISDB-T
+      0x0b = ISDB-Tb
+      0x0c = ISDB-S
+      0x0d = ISDB-C
+      0x0e = 1seg
+      0x0f = DTMB
+      0x10 = CMMB
+      0x11 = T-DMB
+      0x12 = S-DMB
+
+#### Structures
+
+  * Tuner
+      - ID (string)
+      - # of supported types (4 octets)
+      - Supported types (1 octets * # of supported types)
+
+  * Channel
+      - Network ID (string)
+      - Transport stream ID (string)
+      - Service ID (string)
+      - Type (1 octet)
+      - Number / ID (4 octets) (string)
+      - Name (string)
+      - Is emergency (1 octet)
+      - Is free (1 octet)
+
+  * Program
+      - Event ID (string)
+      - Title (string)
+      - Start time (8 octets)
+      - Duration (8 octets)
+      - Description (string)
+      - Rating (string)
+      - # of audio languages (4 octets)
+      - Audio languages (string * # of audio languages)
+      - # of subtitle languages (4 octets)
+      - Subtitle languages (string * # of subtitle languages)
+
 ## References
 
 [1] [Android HAL protocol for Bluetooth](https://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/hal-ipc-api.txt)
