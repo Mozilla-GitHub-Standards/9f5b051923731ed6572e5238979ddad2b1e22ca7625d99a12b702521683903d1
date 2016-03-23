@@ -16,7 +16,34 @@
 
 #include <pdu/pdubuf.h>
 #include "dtv_pdu.h"
+#include "memptr.h"
 #include "assert.h"
+
+int
+build_ancillary_data(struct pdu_wbuf* wbuf, struct msghdr* msg)
+{
+  struct ancillary_data* tail_data;
+  struct cmsghdr* chdr;
+
+  assert(msg);
+
+  tail_data = ceil_align(pdu_wbuf_tail(wbuf), ALIGNMENT_PADDING);
+
+  /* Buffer for ancillary data is append after tail_data. */
+  msg->msg_control = &tail_data->data[tail_data->fd_num];
+
+  /* Assign the maximum length. */
+  msg->msg_controllen = CMSG_SPACE(sizeof(int) * tail_data->fd_num);
+
+  chdr = CMSG_FIRSTHDR(msg);
+  chdr->cmsg_level = SOL_SOCKET;
+  chdr->cmsg_type = SCM_RIGHTS;
+  chdr->cmsg_len = CMSG_LEN(sizeof(int) * tail_data->fd_num);
+  memcpy(CMSG_DATA(chdr), &tail_data->data, sizeof(int) * tail_data->fd_num);
+  msg->msg_controllen = chdr->cmsg_len; /* Assign actual ancillary length. */
+
+  return 0;
+}
 
 uint32_t
 calculate_tuner_size(const struct tv_tuner* tuner)

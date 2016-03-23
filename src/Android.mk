@@ -8,6 +8,7 @@ LOCAL_SRC_FILES:= dtv.c \
                   tv_utils.c \
                   io.c \
                   main.c \
+                  memptr.c \
                   pdu.c \
                   registry.c \
                   service.c

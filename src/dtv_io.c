@@ -23,6 +23,7 @@
 #include "dtv.h"
 #include "tv_hal.h"
 #include "dtv_pdu.h"
+#include "memptr.h"
 
 enum {
   /* commands/responses */
@@ -367,9 +368,22 @@ set_source(const struct pdu* cmd)
                            NULL);
 
   } else {
-    /* TODO: Pass multiple file descriptors within one PDU. */
-    ALOGE("Could not pass more than on file descriptor in a single PDU.");
-    return ERROR_FAIL;
+    fd_num = native_handle->numFds;
+    wbuf = create_pdu_wbuf(sizeof(uint32_t) +                    /* version */
+                           sizeof(uint32_t) +                    /* numFds */
+                           sizeof(uint32_t) +                    /* numInts */
+                           sizeof(int) * native_handle->numInts, /* data */
+                           ALIGNMENT_PADDING +
+                           sizeof(*tail_data) + (sizeof(int) * fd_num) +
+                           (sizeof(unsigned char) *              /* Space for */
+                            CMSG_SPACE(sizeof(int) * fd_num)),   /* control   */
+                           build_ancillary_data);                /* message.  */
+
+    tail_data = ceil_align(pdu_wbuf_tail(wbuf), ALIGNMENT_PADDING);
+    tail_data->fd_num = fd_num;
+    for (idx = 0; idx < fd_num; idx++) {
+      tail_data->data[idx] = native_handle->data[idx];
+    }
   }
 
   if (!wbuf) {

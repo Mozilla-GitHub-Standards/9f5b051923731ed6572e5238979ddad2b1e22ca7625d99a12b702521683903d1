@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-/* This file contains helper macros for pointers and arrays. */
+#include <pdu/pdubuf.h>
+#include "memptr.h"
 
-#pragma once
+static uintptr_t
+_ceil_align(uintptr_t ptr, uintptr_t align)
+{
+  return ((ptr / align) + 1) * align;
+}
 
-#include <stddef.h>
-
-/* Returns the number of elements in an array.
- */
-#define ARRAY_LENGTH(_array) \
-  ( sizeof(_array) / sizeof((_array)[0]) )
-
-/* Returns the container around a field of the container's structure.
- *
- *  _t: the container's type
- *  _v: the address of the field
- *  _m: name of the field in the container (i.e, the container's member)
- */
-#define CONTAINER(_t, _v, _m) \
-  ( (_t*)( ((const unsigned char*)(_v)) - offsetof(_t, _m) ) )
-
-void* ceil_align(void* ptr, size_t align);
+void*
+ceil_align(void* ptr, size_t align)
+{
+  return (void*)_ceil_align((uintptr_t)ptr, (uintptr_t)align);
+}

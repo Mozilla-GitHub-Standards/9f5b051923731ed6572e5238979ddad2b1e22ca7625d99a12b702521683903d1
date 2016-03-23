@@ -21,6 +21,20 @@
 #include "tv_utils.h"
 #include "pdu.h"
 
+#pragma once
+
+/*
+ * For file descriptor sending.
+ */
+static const unsigned long ALIGNMENT_PADDING = sizeof(void*);
+
+struct ancillary_data {
+  int fd_num;
+  int data[0];
+};
+
+int build_ancillary_data(struct pdu_wbuf* wbuf, struct msghdr* msg);
+
 uint32_t calculate_tuner_size(const struct tv_tuner* tuner);
 
 uint32_t calculate_ch_size(const struct tv_channel* ch);
